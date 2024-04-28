@@ -24,6 +24,20 @@ app.get('/api/hello', function (req, res) {
   res.json({ greeting: 'hello API' });
 });
 
+app.use((req, res, next) => {
+  req.clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  next();
+});
+
+app.get('/api/whoami', function (req, res) {
+  const clientInfo = {
+    ip: req.clientIp,
+    software: req.headers['user-agent'],
+    language: req.headers['accept-language']
+};
+res.json(clientInfo);
+});
+
 // listen for requests :)
 var listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
